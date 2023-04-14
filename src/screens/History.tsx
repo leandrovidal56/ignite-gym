@@ -39,7 +39,6 @@ export function History() {
                 )}
                 showsHorizontalScrollIndicator={ false}
             />
-
         </VStack>
     )
 }
