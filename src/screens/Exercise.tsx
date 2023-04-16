@@ -1,6 +1,6 @@
 import { useNavigation } from "@react-navigation/native";
 import { AppNavigatorRoutesProps } from "@routes/app.routes";
-import { VStack, Text, Icon, HStack, Heading, Image, Box } from "native-base";
+import { VStack, Text, Icon, HStack, Heading, Image, Box, ScrollView } from "native-base";
 import { Feather } from "@expo/vector-icons"
 import { TouchableOpacity } from "react-native";
 
@@ -17,6 +17,7 @@ export function Exercise() {
     }
     return (
         <VStack flex={1}>
+            <ScrollView>
             <VStack px={8} bg="gray.600" pt={12}>
                 <TouchableOpacity onPress={handleGoBack}>
                     <Icon as={Feather} name="arrow-left" color="green.500" size={6}/>
@@ -66,6 +67,7 @@ export function Exercise() {
 
                 </Box>
             </VStack>
+            </ScrollView>
         </VStack>
     )
 
