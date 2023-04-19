@@ -22,9 +22,6 @@ export default function App() {
       <AuthContextProvider>
         {fontsLoaded ? <Routes/> : <Loading/>}
       </AuthContextProvider>
-    
-
-    
     </NativeBaseProvider>
   );
 }
