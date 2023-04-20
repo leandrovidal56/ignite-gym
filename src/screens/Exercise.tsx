@@ -12,12 +12,14 @@ import { AppError } from "@utils/AppError";
 import { api } from "@services/api";
 import { useEffect, useState } from "react";
 import { ExerciseDTO } from "@dtos/ExerciseDTO";
+import { Loading } from "@components/Loading";
 
 type RouteParamsProps = {
     exerciseId: string;
 }
 
 export function Exercise() {
+    const [isLoading, setIsLoading] = useState(true)
     const [exercise, setExercise] = useState<ExerciseDTO>({} as ExerciseDTO)
     const navigation = useNavigation<AppNavigatorRoutesProps>()
 
@@ -32,6 +34,7 @@ export function Exercise() {
     }
     async function fetchExerciseDetails(){
         try{
+            setIsLoading(true)
             const response = await api.get(`/exercises/${exerciseId}`)
             setExercise(response.data)
 
@@ -44,6 +47,8 @@ export function Exercise() {
                 placement: 'top',
                 bgColor: 'red.500'
             })
+        }finally{
+            setIsLoading(false)
         }
     }
     useEffect(() =>{
@@ -70,6 +75,7 @@ export function Exercise() {
                     </HStack>
                 </HStack>
             </VStack>
+            { isLoading ? <Loading/> :
             <VStack p={8}> 
             <Box rounded="lg" mb={3} overflow="hidden">
                 <Image
@@ -103,6 +109,7 @@ export function Exercise() {
 
                 </Box>
             </VStack>
+            }
             </ScrollView>
         </VStack>
     )
