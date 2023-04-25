@@ -4,7 +4,7 @@ import { ScreenHeader } from "@components/ScreenHeader";
 import { UserPhoto } from "@components/UserPhoto";
 import { Center, ScrollView, VStack, Skeleton, Text, Heading,  useToast } from "native-base";
 import { useState } from "react";
-import { Alert, TouchableOpacity } from "react-native";
+import {  TouchableOpacity } from "react-native";
 import * as ImagePicker from 'expo-image-picker'
 import * as FileSystem from 'expo-file-system'
 import { Controller, useForm } from 'react-hook-form'
@@ -13,6 +13,7 @@ import * as yup from 'yup'
 import {yupResolver} from '@hookform/resolvers/yup'
 import { api } from "@services/api";
 import { AppError } from "@utils/AppError";
+import defaultUserPhotoImg from "@assets/userPhotoDefault.png"
 
 const PHOTO_SIZE = 33;
 
@@ -64,11 +65,11 @@ export function Profile() {
                 allowsEditing: true,            
             });
             console.log(photoSelected, 'take photo')
-            if(photoSelected.canceled){
-                return
-            }
+            // if(photoSelected.canceled){
+            //     return
+            // }
             if(photoSelected.assets[0].uri){
-                const photoInfo = await FileSystem.getInfoAsync(photoSelected.uri)
+                const photoInfo = await FileSystem.getInfoAsync(photoSelected.assets[0].uri)
                 
                 if(photoInfo.size && (photoInfo.size / 1024 / 1024) > 5){
                     return toast.show({
@@ -77,7 +78,31 @@ export function Profile() {
                         bgColor: 'red.500'
                     })
                 }
-                setUserPhoto(photoSelected.assets[0].uri)
+                // setUserPhoto(photoSelected.assets[0].uri)
+                const fileExtension = photoSelected.assets[0].uri.split('.').pop();
+                const photoFile = {
+                    name: ` ${user.name}.${fileExtension}`.toLocaleLowerCase(),
+                    uri: photoSelected.assets[0].uri,
+                    type: `${photoSelected.assets[0].type}/${fileExtension}`
+                } as any;
+
+                const userPhotoUploadForm = new FormData();
+                userPhotoUploadForm.append('avatar', photoFile)
+                const avatarUpdatedResponse = await api.patch('/users/avatar', userPhotoUploadForm, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                })
+                const userUpdated = user; 
+                userUpdated.avatar = avatarUpdatedResponse.data.avatar;
+                updateUserProfile(userUpdated)
+                
+                toast.show({
+                    title: "Foto atualizada",
+                    placement: 'top',
+                    bgColor: 'green.500'
+                })
+
             }
         }catch(error){
             console.error(error)
@@ -128,7 +153,9 @@ export function Profile() {
                     <Skeleton w={PHOTO_SIZE} h={PHOTO_SIZE} rounded="full"/>
                     :
                     <UserPhoto
-                        source={{uri: userPhoto}}
+                    source={user.avatar
+                        ?  {uri: `${api.defaults.baseURL}/avatar/${user.avatar}` } 
+                        : defaultUserPhotoImg}
                         size={PHOTO_SIZE}
                         alt="Foto de perfil"
                     />
