@@ -1,4 +1,5 @@
 import { HistoryCard } from "@components/HistoryCard";
+import { Loading } from "@components/Loading";
 import { ScreenHeader } from "@components/ScreenHeader";
 import { HistoryByDayDTO } from "@dtos/HistoryByDayDTo";
 import { useFocusEffect } from "@react-navigation/native";
@@ -14,23 +15,24 @@ export function History() {
    
     ]);
     async function fetchHistory(){
+        console.log('passou por aqui000')
         try{
             setIsLoading(true)
             const response = await api.get('/history');
             setExercises(response.data)
 
         }catch(error){
-            
             const isAppError = error instanceof AppError;
             const title = isAppError ? error.message : 'Não foi possível carregar o histórico.'
-
             toast.show({
                 title, 
                 placement: 'top',
                 bgColor: 'red.500'
-            })
-        }finally{
-            setIsLoading(false)
+            });
+
+        } finally{
+            console.log('passou por aqui3')
+            return setIsLoading(false)
         }
     }
     useFocusEffect(useCallback(() => {
@@ -40,7 +42,7 @@ export function History() {
     return (
         <VStack flex={1}>
             <ScreenHeader title="Histórico de Exercícios" />
-            <SectionList
+                <SectionList
                 sections={exercises}
                 keyExtractor={item => item.id}
                 renderItem={({ item }) => (
